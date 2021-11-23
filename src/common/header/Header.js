@@ -59,12 +59,6 @@ class Header extends Component {
                         </Button>
                     </div>
 
-                    <div className="bookshow-button">
-                        <Button variant="contained" color="primary">
-                            Book Show
-                        </Button>
-                    </div>
-
                 </header>
                 <Modal>
 
