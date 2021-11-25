@@ -82,8 +82,8 @@ class Home extends Component {
 
         // To get the released movies
         let dataReleasedMovies = null;
-        let xhrReleased = new XMLHttpRequest();
-        xhrReleased.addEventListener("readystatechange", function () {
+        let xhrReleasedMovies = new XMLHttpRequest();
+        xhrReleasedMovies.addEventListener("readystatechange", function () {
             if (this.readyState === 4) {
                 that.setState({
                     releasedMovies: JSON.parse(this.responseText).movies
@@ -91,14 +91,14 @@ class Home extends Component {
             }
         });
 
-        xhrReleased.open("GET", this.props.baseUrl + "movies?status=RELEASED");
-        xhrReleased.setRequestHeader("Cache-Control", "no-cache");
-        xhrReleased.send(dataReleasedMovies);
+        xhrReleasedMovies.open("GET", this.props.baseUrl + "movies?status=RELEASED");
+        xhrReleasedMovies.setRequestHeader("Cache-Control", "no-cache");
+        xhrReleasedMovies.send(dataReleasedMovies);
 
         // To get the genres
         let dataOfGenres = null;
-        let xhrGenres = new XMLHttpRequest();
-        xhrGenres.addEventListener("readystatechange", function () {
+        let xhrGenresData = new XMLHttpRequest();
+        xhrGenresData.addEventListener("readystatechange", function () {
             if (this.readyState === 4) {
                 that.setState({
                     genresList: JSON.parse(this.responseText).genres
@@ -106,14 +106,14 @@ class Home extends Component {
             }
         });
 
-        xhrGenres.open("GET", this.props.baseUrl + "genres");
-        xhrGenres.setRequestHeader("Cache-Control", "no-cache");
-        xhrGenres.send(dataOfGenres);
+        xhrGenresData.open("GET", this.props.baseUrl + "genres");
+        xhrGenresData.setRequestHeader("Cache-Control", "no-cache");
+        xhrGenresData.send(dataOfGenres);
 
         // Get artists
         let dataOfArtists = null;
-        let xhrArtists = new XMLHttpRequest();
-        xhrArtists.addEventListener("readystatechange", function () {
+        let xhrArtistsData = new XMLHttpRequest();
+        xhrArtistsData.addEventListener("readystatechange", function () {
             if (this.readyState === 4) {
                 that.setState({
                     artistsList: JSON.parse(this.responseText).artists
@@ -121,18 +121,72 @@ class Home extends Component {
             }
         });
 
-        xhrArtists.open("GET", this.props.baseUrl + "artists");
-        xhrArtists.setRequestHeader("Cache-Control", "no-cache");
-        xhrArtists.send(dataOfArtists);
+        xhrArtistsData.open("GET", this.props.baseUrl + "artists");
+        xhrArtistsData.setRequestHeader("Cache-Control", "no-cache");
+        xhrArtistsData.send(dataOfArtists);
         
+    }
+
+    onMovieClick = (movieId) => {
+        this.props.history.push('/movie/' + movieId);
+    }
+    onMovieNameChange = (event) => {
+        this.setState({ movieName: event.target.value });
+    }
+
+    onGenreSelectChange = (event) => {
+        this.setState({ genres: event.target.value });
+    }
+
+    onArtistSelectChange = (event) => {
+        this.setState({ artists: event.target.value });
+    }
+
+    onReleaseDateStartChange = (event) => {
+        this.setState({ releaseDateStart: event.target.value });
+    }
+
+    onReleaseDateEndChange = (event) => {
+        this.setState({ releaseDateEnd: event.target.value });
+    }
+    onFilterButtonClick = () => {
+        let queryString = "?status=RELEASED";
+        if (this.state.movieName !== "") {
+            queryString += "&title=" + this.state.movieName;
+        }
+        if (this.state.genres.length > 0) {
+            queryString += "&genres=" + this.state.genres.toString();
+        }
+        if (this.state.artists.length > 0) {
+            queryString += "&artists=" + this.state.artists.toString();
+        }
+        if (this.state.releaseDateStart !== "") {
+            queryString += "&start_date=" + this.state.releaseDateStart;
+        }
+        if (this.state.releaseDateEnd !== "") {
+            queryString += "&end_date=" + this.state.releaseDateEnd;
+        }
+
+        let that = this; 
+        let dataFilter = null;
+        let xhrFilterData = new XMLHttpRequest();
+        xhrFilterData.addEventListener("readystatechange", function () {
+            if (this.readyState === 4) {
+                that.setState({
+                    releasedMovies: JSON.parse(this.responseText).movies
+                });
+            }
+        });
+        xhrFilterData.open("GET", this.props.baseUrl + "movies" + encodeURI(queryString));
+        xhrFilterData.setRequestHeader("Cache-Control", "no-cache");
+        xhrFilterData.send(dataFilter);
     }
     render() {
         
         const { classes } = this.props;
         return(
             <div>
-                {console.log(classes)}
-                <Header />
+                <Header baseUrl={this.props.baseUrl}/>
                 <div className="heading">
                     <span>Upcoming Movies</span>
                 </div>
@@ -148,7 +202,7 @@ class Home extends Component {
                     <div className="left">
                         <GridList cellHeight={350} cols={4} className={classes.movieList}>
                             {this.state.releasedMovies.map(movie => (
-                                <GridListTile className="released-movie-grid-item" key={"grid" + movie.id}>
+                                <GridListTile className="released-movie-grid-item" onClick={() => this.onMovieClick(movie.id)} key={"grid" + movie.id}>
                                     <img src={movie.poster_url} className="movie-poster" alt={movie.title} />
                                     <GridListTileBar
                                         title={movie.title}
@@ -169,7 +223,7 @@ class Home extends Component {
 
                                 <FormControl className={classes.form}>
                                     <InputLabel htmlFor="movieName">Movie Name</InputLabel>
-                                    <Input id="movieName" />
+                                    <Input id="movieName" onChange={this.onMovieNameChange} />
                                 </FormControl>
 
                                 <FormControl className={classes.form}>
@@ -179,7 +233,7 @@ class Home extends Component {
                                         input={<Input id="select-multiple-checkbox-genre" />}
                                         renderValue={selected => selected.join(',')}
                                         value={this.state.genres}
-                                        onChange={this.genreSelectHandler}
+                                        onChange={this.onGenreSelectChange}
                                     >
                                         {this.state.genresList.map(genre => (
                                             <MenuItem key={genre.id} value={genre.genre}>
@@ -197,7 +251,7 @@ class Home extends Component {
                                         input={<Input id="select-multiple-checkbox" />}
                                         renderValue={selected => selected.join(',')}
                                         value={this.state.artists}
-                                        
+                                        onChange={this.onArtistSelectChange}
                                     >
                                         {this.state.artistsList.map(artist => (
                                             <MenuItem key={artist.id} value={artist.first_name + " " + artist.last_name}>
@@ -215,7 +269,7 @@ class Home extends Component {
                                         type="date"
                                         defaultValue=""
                                         InputLabelProps={{ shrink: true }}
-                                        onChange={this.releaseDateStartHandler}
+                                        onChange={this.onReleaseDateStartChange}
                                     />
                                 </FormControl>
 
@@ -226,12 +280,12 @@ class Home extends Component {
                                         type="date"
                                         defaultValue=""
                                         InputLabelProps={{ shrink: true }}
-                                        onChange={this.releaseDateEndHandler}
+                                        onChange={this.onReleaseDateEndChange}
                                     />
                                 </FormControl>
                                 <br /><br />
                                 <FormControl className={classes.form}>
-                                    <Button variant="contained" color="primary">
+                                    <Button onClick={() => this.onFilterButtonClick()} variant="contained" color="primary">
                                         APPLY
                                     </Button>
                                 </FormControl>
