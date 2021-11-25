@@ -51,7 +51,7 @@ class Header extends Component {
             registerPassword: "",
             contactRequired: "dispNone",
             contact: "",
-            registrationSuccess: false,
+            registrationSuccess: 0,
             loggedIn: sessionStorage.getItem("access-token") == null ? false : true
         }
     }
@@ -149,9 +149,9 @@ class Header extends Component {
         let xhrRegisterRequest = new XMLHttpRequest();
         let that = this;
         xhrRegisterRequest.addEventListener("readystatechange", function () {
-            if (this.readyState === 4 && this.status === 200) {
+            if (this.readyState === 4 && this.status === 201) {
                 that.setState({
-                    registrationSuccess: true
+                    registrationSuccess: 1
                 });
             }
         });
@@ -307,7 +307,7 @@ class Header extends Component {
                                 </FormHelperText>
                             </FormControl>
                             <br /><br />
-                            {this.state.registrationSuccess === true &&
+                            {this.state.registrationSuccess === 1 &&
                                 <FormControl>
                                     <span className="successText">
                                         Registration Successful. Please Login!

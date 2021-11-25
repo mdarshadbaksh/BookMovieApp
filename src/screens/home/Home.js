@@ -186,7 +186,7 @@ class Home extends Component {
         const { classes } = this.props;
         return(
             <div>
-                <Header baseUrl={this.props.baseUrl}/>
+                <Header baseUrl={this.props.baseUrl} showBookShowButton = "true" />
                 <div className="heading">
                     <span>Upcoming Movies</span>
                 </div>
