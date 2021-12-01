@@ -66,9 +66,9 @@ class Details extends Component {
 
     onStarClick = (id) => {
         let starIconList = [];
-        for (let star of this.state.starIcons) {
-            let starNode = star;
-            if (star.id <= id) {
+        for (let st of this.state.starIcons) {
+            let starNode = st;
+            if (st.id <= id) {
                 starNode.color = "yellow"
             }
             else {
@@ -76,6 +76,7 @@ class Details extends Component {
 
             }
             starIconList.push(starNode);
+
         }
         this.setState({ starIcons: starIconList });
     }
@@ -131,7 +132,6 @@ class Details extends Component {
                             <Typography>
                                 <span className="common-text-bold">Trailer:</span>
                             </Typography>
-                            {console.log(movie)}
                             <YouTube
                                 videoId={movie.trailer_url.split("?v=")[1]}
                                 opts={opts}
